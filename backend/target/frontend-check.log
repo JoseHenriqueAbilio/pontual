@@ -1,0 +1,22 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-05T19:19:35.928-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] b.c.g.GuiaEstabelecimentosApplication    : Starting GuiaEstabelecimentosApplication v0.0.1-SNAPSHOT using Java 21.0.12.1 with PID 3976 (C:\Users\Dar\Desktop\trabalho bnaco de dados\backend\target\guia-estabelecimentos-0.0.1-SNAPSHOT.jar started by Dar in C:\Users\Dar\Desktop\trabalho bnaco de dados\backend)
+2026-11-05T19:19:35.932-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] b.c.g.GuiaEstabelecimentosApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-11-05T19:19:36.690-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-11-05T19:19:36.702-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-05T19:19:36.703-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-05T19:19:36.732-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 750 ms
+2026-11-05T19:19:36.812-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: URL [file:../frontend/index.html]
+2026-11-05T19:19:37.000-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 58660 (http) with context path '/'
+2026-11-05T19:19:37.011-03:00  INFO 3976 --- [guia-estabelecimentos] [           main] b.c.g.GuiaEstabelecimentosApplication    : Started GuiaEstabelecimentosApplication in 1.447 seconds (process running for 1.835)
+2026-11-05T19:19:37.230-03:00  INFO 3976 --- [guia-estabelecimentos] [1-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-05T19:19:37.230-03:00  INFO 3976 --- [guia-estabelecimentos] [1-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-05T19:19:37.231-03:00  INFO 3976 --- [guia-estabelecimentos] [1-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
