@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.List;
 
 
 @Service
@@ -33,6 +34,20 @@ public class EstabelecimentoService {
     @Transactional(readOnly = true)
     public Estabelecimento consultar(Long id) {
         return buscar(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Estabelecimento> buscarProximos(double latitude, double longitude, double distancia) {
+        if (!Double.isFinite(latitude) || latitude < -90 || latitude > 90) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Latitude inválida");
+        }
+        if (!Double.isFinite(longitude) || longitude < -180 || longitude > 180) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Longitude inválida");
+        }
+        if (!Double.isFinite(distancia) || distancia <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Distância deve ser maior que zero, em metros");
+        }
+        return repository.buscarProximos(latitude, longitude, distancia);
     }
 
     @Transactional

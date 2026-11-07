@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +42,33 @@ class EstabelecimentoControllerTest {
         estabelecimento.setLocalizacao(new org.locationtech.jts.geom.GeometryFactory()
                 .createPoint(new org.locationtech.jts.geom.Coordinate(-38.56, -6.89)));
         return estabelecimento;
+    }
+
+    @Test
+    void buscarProximosRetornaListaEUsaRotaCorreta() throws Exception {
+        when(service.buscarProximos(-6.89, -38.56, 2000)).thenReturn(List.of(resposta()));
+        mvc.perform(get("/api/estabelecimentos/proximos")
+                        .param("lat", "-6.89").param("lng", "-38.56").param("distancia", "2000"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].nome").value("Mercado"));
+        verify(service).buscarProximos(-6.89, -38.56, 2000);
+    }
+
+    @Test
+    void buscarProximosSemResultadosRetornaListaVazia() throws Exception {
+        when(service.buscarProximos(0, 0, 100)).thenReturn(List.of());
+        mvc.perform(get("/api/estabelecimentos/proximos")
+                        .param("lat", "0").param("lng", "0").param("distancia", "100"))
+                .andExpect(status().isOk()).andExpect(content().json("[]"));
+    }
+
+    @Test
+    void buscarProximosExigeTodosOsParametros() throws Exception {
+        mvc.perform(get("/api/estabelecimentos/proximos")
+                        .param("lat", "0").param("lng", "0"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(service);
     }
 
     @Test

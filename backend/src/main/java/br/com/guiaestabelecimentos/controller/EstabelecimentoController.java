@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/estabelecimentos")
@@ -33,6 +35,13 @@ public class EstabelecimentoController {
     @GetMapping("/{id}")
     public Estabelecimento consultar(@PathVariable Long id) {
         return service.consultar(id);
+    }
+
+    @GetMapping("/proximos")
+    public List<Estabelecimento> buscarProximos(@RequestParam double lat,
+                                              @RequestParam double lng,
+                                              @RequestParam double distancia) {
+        return service.buscarProximos(lat, lng, distancia);
     }
 
     @PutMapping("/{id}")
