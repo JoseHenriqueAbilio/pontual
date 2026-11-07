@@ -114,8 +114,24 @@ function iniciarMapa() {
         }
     }
 
+    function mostrarLocalizacao(posicao) {
+        const coordenadas = [posicao.coords.latitude, posicao.coords.longitude];
+        mapa.setView(coordenadas, 13);
+        L.marker(coordenadas, { alt: 'Sua localização' })
+            .bindPopup('Sua localização')
+            .addTo(mapa)
+            .openPopup();
+        buscarArea();
+    }
+
     pesquisa.addEventListener('input', mostrarEstabelecimentos);
     categoria.addEventListener('change', mostrarEstabelecimentos);
     botaoBuscar.addEventListener('click', buscarArea);
-    buscarArea();
+    if (navigator.geolocation) {
+        botaoBuscar.disabled = true;
+        mensagem.textContent = 'Aguardando a localização do navegador...';
+        navigator.geolocation.getCurrentPosition(mostrarLocalizacao, buscarArea, { timeout: 10000 });
+    } else {
+        buscarArea();
+    }
 }
