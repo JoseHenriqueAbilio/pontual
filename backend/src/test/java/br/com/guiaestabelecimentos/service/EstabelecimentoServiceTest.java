@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +34,33 @@ class EstabelecimentoServiceTest {
         estabelecimento.setLatitude(latitude);
         estabelecimento.setLongitude(longitude);
         return estabelecimento;
+    }
+
+    @Test
+    void buscarProximosEnviaCoordenadasEDistanciaEmMetros() {
+        List<Estabelecimento> encontrados = List.of(dados("Mercado", -6.89, -38.56));
+        when(repository.buscarProximos(-6.89, -38.56, 2000)).thenReturn(encontrados);
+
+        assertSame(encontrados, service.buscarProximos(-6.89, -38.56, 2000));
+        verify(repository).buscarProximos(-6.89, -38.56, 2000);
+    }
+
+    @Test
+    void buscarProximosRejeitaParametrosInvalidosAntesDeConsultar() {
+        double[][] entradas = {
+                {91, 0, 2000}, {0, -181, 2000}, {0, 0, 0}, {0, 0, -1},
+                {Double.NaN, 0, 2000}, {0, Double.POSITIVE_INFINITY, 2000},
+                {0, 0, Double.NaN}
+        };
+        for (double[] entrada : entradas) {
+            try {
+                service.buscarProximos(entrada[0], entrada[1], entrada[2]);
+                fail("Deveria rejeitar os parâmetros inválidos");
+            } catch (ResponseStatusException erro) {
+                assertEquals(HttpStatus.BAD_REQUEST, erro.getStatusCode());
+            }
+        }
+        verifyNoInteractions(repository);
     }
 
     @Test
