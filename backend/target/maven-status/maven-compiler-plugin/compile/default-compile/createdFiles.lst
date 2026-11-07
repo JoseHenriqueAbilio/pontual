@@ -1,0 +1,5 @@
+br\com\guiaestabelecimentos\controller\EstabelecimentoController.class
+br\com\guiaestabelecimentos\model\Estabelecimento.class
+br\com\guiaestabelecimentos\GuiaEstabelecimentosApplication.class
+br\com\guiaestabelecimentos\repository\EstabelecimentoRepository.class
+br\com\guiaestabelecimentos\service\EstabelecimentoService.class

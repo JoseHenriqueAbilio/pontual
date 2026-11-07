@@ -10,3 +10,4 @@ public class GuiaEstabelecimentosApplication {
         SpringApplication.run(GuiaEstabelecimentosApplication.class, args);
     }
 }
+
