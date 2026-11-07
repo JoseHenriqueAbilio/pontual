@@ -49,6 +49,14 @@ public class EstabelecimentoController {
         return service.atualizar(id, dados);
     }
 
+    @GetMapping("/area")
+    public List<Estabelecimento> buscarPorArea(@RequestParam double sul,
+                                             @RequestParam double norte,
+                                             @RequestParam double oeste,
+                                             @RequestParam double leste) {
+        return service.buscarPorArea(sul, norte, oeste, leste);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         service.excluir(id);

@@ -84,6 +84,55 @@ class EstabelecimentoControllerTest {
     }
 
     @Test
+    void buscarPorAreaRetornaEstabelecimentosComCoordenadas() throws Exception {
+        when(service.buscarPorArea(-6.95, -6.85, -38.65, -38.50)).thenReturn(List.of(resposta()));
+        mvc.perform(get("/api/estabelecimentos/area")
+                        .param("sul", "-6.95").param("norte", "-6.85")
+                        .param("oeste", "-38.65").param("leste", "-38.50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].latitude").value(-6.89))
+                .andExpect(jsonPath("$[0].longitude").value(-38.56));
+        verify(service).buscarPorArea(-6.95, -6.85, -38.65, -38.50);
+    }
+
+    @Test
+    void buscarPorAreaSemResultadosRetornaListaVazia() throws Exception {
+        when(service.buscarPorArea(0, 1, 0, 1)).thenReturn(List.of());
+        mvc.perform(get("/api/estabelecimentos/area")
+                        .param("sul", "0").param("norte", "1")
+                        .param("oeste", "0").param("leste", "1"))
+                .andExpect(status().isOk()).andExpect(content().json("[]"));
+    }
+
+    @Test
+    void buscarPorAreaExigeTodosOsLimites() throws Exception {
+        mvc.perform(get("/api/estabelecimentos/area")
+                        .param("sul", "0").param("norte", "1").param("oeste", "0"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void buscarPorAreaRejeitaParametroNaoNumerico() throws Exception {
+        mvc.perform(get("/api/estabelecimentos/area")
+                        .param("sul", "texto").param("norte", "1")
+                        .param("oeste", "0").param("leste", "1"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void buscarPorAreaRetorna400QuandoServiceRejeitaLimites() throws Exception {
+        when(service.buscarPorArea(1, 0, 0, 1))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST));
+        mvc.perform(get("/api/estabelecimentos/area")
+                        .param("sul", "1").param("norte", "0")
+                        .param("oeste", "0").param("leste", "1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void consultarRetorna200() throws Exception {
         when(service.consultar(id)).thenReturn(resposta());
         mvc.perform(get("/api/estabelecimentos/" + id))

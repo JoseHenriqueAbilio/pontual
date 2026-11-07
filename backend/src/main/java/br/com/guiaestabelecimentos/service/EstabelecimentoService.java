@@ -57,6 +57,22 @@ public class EstabelecimentoService {
         return repository.save(estabelecimento);
     }
 
+    @Transactional(readOnly = true)
+    public List<Estabelecimento> buscarPorArea(double sul, double norte, double oeste, double leste) {
+        if (!Double.isFinite(sul) || !Double.isFinite(norte)
+                || sul < -90 || sul > 90 || norte < -90 || norte > 90) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Latitudes da área inválidas");
+        }
+        if (!Double.isFinite(oeste) || !Double.isFinite(leste)
+                || oeste < -180 || oeste > 180 || leste < -180 || leste > 180) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Longitudes da área inválidas");
+        }
+        if (sul >= norte || oeste >= leste) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe sul menor que norte e oeste menor que leste");
+        }
+        return repository.buscarPorArea(sul, norte, oeste, leste);
+    }
+
     @Transactional
     public void excluir(Long id) {
         repository.delete(buscar(id));
