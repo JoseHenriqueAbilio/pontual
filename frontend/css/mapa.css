@@ -1,0 +1,27 @@
+.painel {
+    display: grid;
+    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.painel aside {
+    max-height: 65vh;
+    overflow: auto;
+    overflow-wrap: anywhere;
+}
+
+#mapa {
+    width: 500px;
+    height: 500px;
+}
+
+@media (max-width: 800px) {
+    .painel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .painel aside {
+        max-height: none;
+    }
+}
