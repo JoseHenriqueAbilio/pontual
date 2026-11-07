@@ -81,6 +81,35 @@ class EstabelecimentoServiceTest {
     }
 
     @Test
+    void buscarPorAreaEnviaOsQuatroLimitesAoRepository() {
+        List<Estabelecimento> encontrados = List.of(dados("Mercado", -6.89, -38.56));
+        when(repository.buscarPorArea(-6.95, -6.85, -38.65, -38.50)).thenReturn(encontrados);
+
+        assertSame(encontrados, service.buscarPorArea(-6.95, -6.85, -38.65, -38.50));
+        verify(repository).buscarPorArea(-6.95, -6.85, -38.65, -38.50);
+    }
+
+    @Test
+    void buscarPorAreaRejeitaLimitesInvalidosAntesDeConsultar() {
+        double[][] entradas = {
+                {-91, 0, -10, 10}, {0, 91, -10, 10}, {-10, 10, -181, 0},
+                {-10, 10, 0, 181}, {10, -10, -10, 10}, {-10, 10, 10, -10},
+                {0, 0, -10, 10}, {-10, 10, 0, 0}, {Double.NaN, 10, -10, 10},
+                {-10, Double.POSITIVE_INFINITY, -10, 10}, {-10, 10, Double.NaN, 10},
+                {-10, 10, -10, Double.POSITIVE_INFINITY}
+        };
+        for (double[] entrada : entradas) {
+            try {
+                service.buscarPorArea(entrada[0], entrada[1], entrada[2], entrada[3]);
+                fail("Deveria rejeitar os limites inválidos");
+            } catch (ResponseStatusException erro) {
+                assertEquals(HttpStatus.BAD_REQUEST, erro.getStatusCode());
+            }
+        }
+        verifyNoInteractions(repository);
+    }
+
+    @Test
     void consultarRetornaDadosDoEstabelecimento() {
         Long id = 1L;
         Estabelecimento existente = new Estabelecimento();
