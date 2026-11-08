@@ -1,14 +1,196 @@
-.painel {
-    display: grid;
-    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
+:root {
+    --fundo: #e7e7e7;
+    --superficie: #ebebeb;
+    --principal: #85ff74;
+    --contraste: #252525;
+    --borda: #c8c8c8;
 }
 
-.painel aside {
-    max-height: 65vh;
-    overflow: auto;
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--contraste);
+    font: 1rem/1.5 system-ui, sans-serif;
+}
+
+.cabecalho {
+    background: var(--contraste);
+    color: var(--fundo);
+}
+
+.cabecalho-conteudo, .pagina {
+    width: min(100% - 2rem, 65rem);
+    margin-inline: auto;
+}
+
+.cabecalho-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    padding-block: 0.75rem;
+}
+
+.marca img {
+    display: block;
+    width: 8rem;
+    height: auto;
+}
+
+.cabecalho nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.cabecalho nav a {
+    color: inherit;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.cabecalho nav a[aria-current="page"], .cabecalho nav a:hover {
+    background: var(--principal);
+    color: var(--contraste);
+}
+
+.pagina { padding-block: 2rem; }
+
+h1 {
+    margin: 0;
+    font-size: clamp(1.65rem, 4vw, 2.5rem);
+    line-height: 1.15;
+}
+
+.introducao { margin: 0.5rem 0 1.5rem; }
+
+.boas-vindas {
+    margin-bottom: 1.25rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-left: 0.45rem solid var(--principal);
+    border-radius: 0.75rem;
+}
+
+.rotulo-inicio {
+    margin: 0 0 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.acoes-inicio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+}
+
+.acao {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--contraste);
+    border-radius: 0.45rem;
+    color: var(--contraste);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.acao-principal, .acao:hover { background: var(--principal); }
+.acao-principal:hover { text-decoration: underline; }
+
+:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+
+.painel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 34rem);
+    align-items: start;
+    gap: 1rem;
+}
+
+.painel aside, .area-mapa {
+    min-width: 0;
+    padding: 1.25rem;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: 0.75rem;
     overflow-wrap: anywhere;
+}
+
+.painel h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.painel aside a { color: inherit; }
+.painel aside label { font-weight: 600; }
+
+.painel aside input, .painel aside select, .painel aside textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.25rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #787878;
+    border-radius: 0.45rem;
+    background: var(--fundo);
+    color: inherit;
+    font: inherit;
+}
+
+.painel aside textarea { resize: vertical; }
+
+.painel aside button {
+    margin-block: 0.25rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--contraste);
+    border-radius: 0.45rem;
+    background: var(--principal);
+    color: var(--contraste);
+    font: inherit;
+    cursor: pointer;
+}
+
+.painel aside button:hover:not(:disabled) { background: #70eb60; }
+
+.painel aside button:disabled {
+    opacity: 0.65;
+    cursor: default;
+}
+
+#busca-proximos, #cadastro, #estabelecimentos:not(:empty) {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--borda);
+}
+
+#estabelecimentos {
+    list-style: none;
+    padding-left: 0;
+}
+
+#estabelecimentos button, #excluir-estabelecimento {
+    width: 100%;
+    background: transparent;
+    color: var(--contraste);
+    text-align: left;
+}
+
+#estabelecimentos button:hover:not(:disabled), #excluir-estabelecimento:hover:not(:disabled) {
+    background: var(--fundo);
+}
+
+.mapa-rolagem {
+    overflow: auto;
+    border-radius: 0.5rem;
 }
 
 #mapa {
@@ -16,13 +198,7 @@
     height: 500px;
 }
 
-@media (max-width: 800px) {
-    .painel {
-        grid-template-columns: minmax(0, 1fr);
-        overflow-x: auto;
-    }
-
-    .painel aside {
-        max-height: none;
-    }
+@media (max-width: 880px) {
+    .painel { grid-template-columns: minmax(0, 1fr); }
+    .pagina { padding-block: 1.25rem; }
 }
