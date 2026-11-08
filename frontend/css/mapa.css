@@ -19,6 +19,7 @@
 @media (max-width: 800px) {
     .painel {
         grid-template-columns: minmax(0, 1fr);
+        overflow-x: auto;
     }
 
     .painel aside {

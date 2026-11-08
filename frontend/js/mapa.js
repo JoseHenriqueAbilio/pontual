@@ -70,6 +70,11 @@ function iniciarMapa() {
                 }
             }
 
+            const editar = document.createElement('a');
+            editar.href = 'cadastro.html?id=' + encodeURIComponent(estabelecimento.id);
+            editar.textContent = 'Editar ou excluir';
+            conteudo.append(document.createElement('br'), editar);
+
             const marcador = L.marker([estabelecimento.latitude, estabelecimento.longitude], {
                 alt: estabelecimento.nome
             }).bindPopup(conteudo).addTo(marcadores);

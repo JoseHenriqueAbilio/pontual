@@ -11,7 +11,7 @@
     <script src="js/cadastro.js" defer></script>
 </head>
 <body>
-    <h1>Cadastro de estabelecimento</h1>
+    <h1 id="titulo-pagina">Cadastro de estabelecimento</h1>
     <p>
         <a href="index.html">Início</a> |
         <a href="cadastro.html">Cadastro</a>
@@ -19,7 +19,7 @@
     <hr>
     <main class="painel">
         <aside>
-            <h2>Cadastrar um comércio</h2>
+            <h2 id="titulo-formulario">Cadastrar um comércio</h2>
             <form id="busca-endereco" data-geocodificador="https://nominatim.openstreetmap.org/search">
                 <label for="consulta-endereco">Pesquisar endereço comercial</label><br>
                 <input type="search" id="consulta-endereco" required>
@@ -45,7 +45,8 @@
                 <p><label for="descricao">Descrição</label><br><textarea id="descricao" name="descricao"></textarea></p>
                 <p><label for="telefone">Telefone</label><br><input type="tel" id="telefone" name="telefone"></p>
                 <p><label for="endereco">Endereço</label><br><input id="endereco" name="endereco"></p>
-                <button type="submit">Cadastrar</button>
+                <button type="submit" id="salvar-estabelecimento">Cadastrar</button>
+                <button type="button" id="excluir-estabelecimento" hidden>Excluir estabelecimento</button>
                 <p id="mensagem-cadastro" role="status"></p>
             </form>
         </aside>
