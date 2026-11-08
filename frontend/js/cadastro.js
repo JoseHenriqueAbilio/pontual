@@ -20,10 +20,55 @@ function iniciarCadastro() {
     const resultados = document.getElementById('resultados-endereco');
     const mensagemBusca = document.getElementById('mensagem-busca');
     const posicao = document.getElementById('posicao');
+    const id = new URLSearchParams(window.location.search).get('id');
+    const api = '/api/estabelecimentos';
+    const recurso = id === null ? api : api + '/' + encodeURIComponent(id);
+    const salvar = document.getElementById('salvar-estabelecimento');
+    const excluir = document.getElementById('excluir-estabelecimento');
     const cache = new Map();
     let ultimaBusca = 0;
     let enderecos = [];
     let marcador;
+
+    async function carregarEstabelecimento() {
+        salvar.disabled = true;
+        document.title = 'Editar estabelecimento';
+        document.getElementById('titulo-pagina').textContent = 'Editar estabelecimento';
+        document.getElementById('titulo-formulario').textContent = 'Dados do estabelecimento';
+        salvar.textContent = 'Salvar alterações';
+        if (!/^[1-9][0-9]*$/.test(id)) {
+            mensagemCadastro.textContent = 'ID do estabelecimento inválido.';
+            return;
+        }
+
+        mensagemCadastro.textContent = 'Carregando estabelecimento...';
+        try {
+            const resposta = await fetch(recurso);
+            if (!resposta.ok) {
+                mensagemCadastro.textContent = resposta.status === 404
+                    ? 'Estabelecimento não encontrado.'
+                    : 'Não foi possível carregar o estabelecimento (HTTP ' + resposta.status + ').';
+                return;
+            }
+            const dados = await resposta.json();
+            const categoria = cadastro.elements.categoria;
+            categoria.value = dados.categoria;
+            if (!categoria.value && dados.categoria) {
+                categoria.add(new Option(dados.categoria, dados.categoria, false, true));
+            }
+            for (const campo of ['nome', 'descricao', 'telefone', 'endereco']) {
+                cadastro.elements[campo].value = dados[campo] ?? '';
+            }
+            const ponto = L.latLng(dados.latitude, dados.longitude);
+            marcarPonto(ponto);
+            mapa.setView(ponto, 17);
+            mensagemCadastro.textContent = '';
+            salvar.disabled = false;
+            excluir.hidden = false;
+        } catch (erro) {
+            mensagemCadastro.textContent = 'Não foi possível carregar o estabelecimento. Recarregue a página.';
+        }
+    }
 
     function marcarPonto(ponto) {
         if (marcador) {
@@ -98,12 +143,11 @@ function iniciarCadastro() {
 
     cadastro.addEventListener('submit', async function (evento) {
         evento.preventDefault();
-        const botao = cadastro.querySelector('button');
-        if (botao.disabled) {
+        if (salvar.disabled) {
             return;
         }
         if (!marcador) {
-            mensagemCadastro.textContent = 'Selecione um ponto no mapa antes de cadastrar.';
+            mensagemCadastro.textContent = 'Selecione um ponto no mapa antes de salvar.';
             return;
         }
 
@@ -117,16 +161,21 @@ function iniciarCadastro() {
         dados.latitude = ponto.lat;
         dados.longitude = ponto.lng;
 
-        botao.disabled = true;
-        mensagemCadastro.textContent = 'Cadastrando...';
+        salvar.disabled = true;
+        excluir.disabled = true;
+        mensagemCadastro.textContent = 'Salvando estabelecimento...';
         try {
-            const resposta = await fetch('/api/estabelecimentos', {
-                method: 'POST',
+            const resposta = await fetch(recurso, {
+                method: id === null ? 'POST' : 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
             });
             if (!resposta.ok) {
-                mensagemCadastro.textContent = 'O cadastro falhou (HTTP ' + resposta.status + ').';
+                mensagemCadastro.textContent = 'Não foi possível salvar (HTTP ' + resposta.status + ').';
+                return;
+            }
+            if (id !== null) {
+                mensagemCadastro.textContent = 'Alterações salvas.';
                 return;
             }
             const criado = await resposta.json();
@@ -137,9 +186,35 @@ function iniciarCadastro() {
             resultados.value = '';
             posicao.textContent = 'Nenhum ponto selecionado.';
         } catch (erro) {
-            mensagemCadastro.textContent = 'Não foi possível confirmar o cadastro. Confira antes de tentar novamente.';
+            mensagemCadastro.textContent = 'Não foi possível confirmar o envio. Confira antes de tentar novamente.';
         } finally {
-            botao.disabled = false;
+            salvar.disabled = false;
+            excluir.disabled = false;
         }
     });
+
+    excluir.addEventListener('click', async function () {
+        if (excluir.hidden || excluir.disabled || !window.confirm('Excluir este estabelecimento?')) {
+            return;
+        }
+        salvar.disabled = true;
+        excluir.disabled = true;
+        mensagemCadastro.textContent = 'Excluindo estabelecimento...';
+        try {
+            const resposta = await fetch(recurso, { method: 'DELETE' });
+            if (resposta.ok) {
+                window.location.assign('index.html');
+                return;
+            }
+            mensagemCadastro.textContent = 'Não foi possível excluir (HTTP ' + resposta.status + ').';
+        } catch (erro) {
+            mensagemCadastro.textContent = 'Não foi possível confirmar a exclusão. Confira antes de tentar novamente.';
+        }
+        salvar.disabled = false;
+        excluir.disabled = false;
+    });
+
+    if (id !== null) {
+        carregarEstabelecimento();
+    }
 }
