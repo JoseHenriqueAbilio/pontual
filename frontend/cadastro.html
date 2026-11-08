@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/mapa.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script src="js/cadastro.js" defer></script>
 </head>
 <body>
     <h1>Cadastro de estabelecimento</h1>
@@ -12,7 +17,40 @@
         <a href="cadastro.html">Cadastro</a>
     </p>
     <hr>
-    <h2>Cadastrar um comércio</h2>
+    <main class="painel">
+        <aside>
+            <h2>Cadastrar um comércio</h2>
+            <form id="busca-endereco" data-geocodificador="https://nominatim.openstreetmap.org/search">
+                <label for="consulta-endereco">Pesquisar endereço comercial</label><br>
+                <input type="search" id="consulta-endereco" required>
+                <button type="submit">Buscar endereço</button>
+                <p>Dados de endereço do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</p>
+                <p id="mensagem-busca" role="status"></p>
+                <label for="resultados-endereco">Endereços encontrados</label><br>
+                <select id="resultados-endereco" disabled>
+                    <option value="">Selecione um endereço</option>
+                </select>
+            </form>
+            <p>Escolha um endereço ou clique diretamente no mapa.</p>
+            <p id="posicao" role="status">Nenhum ponto selecionado.</p>
+            <form id="cadastro">
+                <p><label for="nome">Nome</label><br><input id="nome" name="nome" required></p>
+                <p><label for="categoria">Categoria</label><br>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecione</option>
+                        <option>Restaurante</option><option>Mercado</option><option>Farmácia</option>
+                        <option>Oficina</option><option>Loja</option><option>Outros</option>
+                    </select>
+                </p>
+                <p><label for="descricao">Descrição</label><br><textarea id="descricao" name="descricao"></textarea></p>
+                <p><label for="telefone">Telefone</label><br><input type="tel" id="telefone" name="telefone"></p>
+                <p><label for="endereco">Endereço</label><br><input id="endereco" name="endereco"></p>
+                <button type="submit">Cadastrar</button>
+                <p id="mensagem-cadastro" role="status"></p>
+            </form>
+        </aside>
+        <div id="mapa" aria-label="Mapa para selecionar a localização"></div>
+    </main>
 
 </body>
 </html>
