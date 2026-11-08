@@ -3,46 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guia local</title>
+    <title>Pontual | Guia local</title>
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-    <link rel="stylesheet" href="css/mapa.css">
+    <link rel="stylesheet" href="css/mapa.css?v=2">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
     <script src="js/mapa.js" defer></script>
 </head>
 <body>
-    <h1>Guia de estabelecimentos locais</h1>
-    <nav>
-        <a href="index.html">Início</a> |
-        <a href="cadastro.html">Cadastro</a>
-    </nav>
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="index.html?v=2"><img src="assets/pontual-logo.png" alt="Pontual"></a>
+            <nav aria-label="Menu principal">
+                <a href="index.html?v=2" aria-current="page">Início</a>
+                <a href="cadastro.html">Cadastro</a>
+            </nav>
+        </div>
+    </header>
 
-    <main class="painel">
-        <aside>
-            <h2>Estabelecimentos</h2>
-            <p>
-                <label for="pesquisa">Pesquisar por nome</label><br>
-                <input type="search" id="pesquisa">
-            </p>
-            <p>
-                <label for="categoria">Categoria</label><br>
-                <select id="categoria">
-                    <option value="">Todas</option>
-                </select>
-            </p>
-            <button type="button" id="buscar-area">Buscar nesta área</button>
-            <form id="busca-proximos">
+    <main class="pagina">
+        <section class="boas-vindas" aria-labelledby="titulo-inicio">
+            <p class="rotulo-inicio">Pontual · Guia local</p>
+            <h1 id="titulo-inicio">Encontre estabelecimentos perto de você</h1>
+            <p>Explore a região no mapa, filtre por categoria ou cadastre um novo estabelecimento.</p>
+            <div class="acoes-inicio">
+                <a class="acao acao-principal" href="#explorar">Explorar o mapa</a>
+                <a class="acao" href="cadastro.html">Cadastrar estabelecimento</a>
+            </div>
+        </section>
+        <div class="painel" id="explorar">
+            <aside>
+                <h2>Estabelecimentos</h2>
                 <p>
-                    <label for="distancia">Distância em metros</label><br>
-                    <input type="number" id="distancia" min="1" value="2000" required>
+                    <label for="pesquisa">Pesquisar por nome</label>
+                    <input type="search" id="pesquisa">
                 </p>
-                <button type="submit" id="buscar-proximos" disabled>Buscar próximos</button>
-                <p id="aviso-localizacao">Permita o acesso à localização para buscar próximos.</p>
-            </form>
-            <p id="mensagem" role="status"></p>
-            <ul id="estabelecimentos"></ul>
-        </aside>
-        <div id="mapa" aria-label="Mapa dos estabelecimentos"></div>
+                <p>
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria">
+                        <option value="">Todas</option>
+                    </select>
+                </p>
+                <button type="button" id="buscar-area">Buscar nesta área</button>
+                <form id="busca-proximos">
+                    <p>
+                        <label for="distancia">Distância em metros</label>
+                        <input type="number" id="distancia" min="1" value="2000" required>
+                    </p>
+                    <button type="submit" id="buscar-proximos" disabled>Buscar próximos</button>
+                    <p id="aviso-localizacao">Permita o acesso à localização para buscar próximos.</p>
+                </form>
+                <p id="mensagem" role="status"></p>
+                <ul id="estabelecimentos"></ul>
+            </aside>
+            <section class="area-mapa" aria-labelledby="titulo-mapa">
+                <h2 id="titulo-mapa">Mapa dos estabelecimentos</h2>
+                <div class="mapa-rolagem">
+                    <div id="mapa" aria-label="Mapa dos estabelecimentos"></div>
+                </div>
+            </section>
+        </div>
     </main>
 </body>
 </html>

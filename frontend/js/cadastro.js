@@ -203,7 +203,7 @@ function iniciarCadastro() {
         try {
             const resposta = await fetch(recurso, { method: 'DELETE' });
             if (resposta.ok) {
-                window.location.assign('index.html');
+                window.location.assign('index.html?v=2');
                 return;
             }
             mensagemCadastro.textContent = 'Não foi possível excluir (HTTP ' + resposta.status + ').';
