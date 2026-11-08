@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontual | Cadastro</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/mapa.css?v=2">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script src="js/cadastro.js" defer></script>
+</head>
+<body>
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="index.html?v=2"><img src="assets/pontual-logo.png" alt="Pontual"></a>
+            <nav aria-label="Menu principal">
+                <a href="index.html?v=2">Início</a>
+                <a href="cadastro.html" aria-current="page">Cadastro</a>
+            </nav>
+        </div>
+    </header>
+    <main class="pagina">
+        <h1 id="titulo-pagina">Cadastro de estabelecimento</h1>
+        <p class="introducao">Preencha os dados e selecione a localização no mapa.</p>
+        <div class="painel">
+            <aside>
+                <h2 id="titulo-formulario">Cadastrar um comércio</h2>
+                <form id="busca-endereco" data-geocodificador="https://nominatim.openstreetmap.org/search">
+                    <label for="consulta-endereco">Pesquisar endereço comercial</label>
+                    <input type="search" id="consulta-endereco" required>
+                    <button type="submit">Buscar endereço</button>
+                    <p>Dados de endereço do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</p>
+                    <p id="mensagem-busca" role="status"></p>
+                    <label for="resultados-endereco">Endereços encontrados</label>
+                    <select id="resultados-endereco" disabled>
+                        <option value="">Selecione um endereço</option>
+                    </select>
+                </form>
+                <p>Escolha um endereço ou clique diretamente no mapa.</p>
+                <p id="posicao" role="status">Nenhum ponto selecionado.</p>
+                <form id="cadastro">
+                    <p><label for="nome">Nome</label><input id="nome" name="nome" required></p>
+                    <p><label for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Selecione</option>
+                            <option>Restaurante</option><option>Mercado</option><option>Farmácia</option>
+                            <option>Oficina</option><option>Loja</option><option>Outros</option>
+                        </select>
+                    </p>
+                    <p><label for="descricao">Descrição</label><textarea id="descricao" name="descricao"></textarea></p>
+                    <p><label for="telefone">Telefone</label><input type="tel" id="telefone" name="telefone"></p>
+                    <p><label for="endereco">Endereço</label><input id="endereco" name="endereco"></p>
+                    <button type="submit" id="salvar-estabelecimento">Cadastrar</button>
+                    <button type="button" id="excluir-estabelecimento" hidden>Excluir estabelecimento</button>
+                    <p id="mensagem-cadastro" role="status"></p>
+                </form>
+            </aside>
+            <section class="area-mapa" aria-labelledby="titulo-mapa">
+                <h2 id="titulo-mapa">Localização do estabelecimento</h2>
+                <div class="mapa-rolagem">
+                    <div id="mapa" aria-label="Mapa para selecionar a localização"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+</body>
+</html>

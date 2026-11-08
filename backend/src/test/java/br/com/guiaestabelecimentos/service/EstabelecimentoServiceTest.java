@@ -1,0 +1,194 @@
+package br.com.guiaestabelecimentos.service;
+
+import br.com.guiaestabelecimentos.model.Estabelecimento;
+import br.com.guiaestabelecimentos.repository.EstabelecimentoRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class EstabelecimentoServiceTest {
+
+    private EstabelecimentoRepository repository;
+    private EstabelecimentoService service;
+
+    @BeforeEach
+    void preparar() {
+        repository = mock(EstabelecimentoRepository.class);
+        service = new EstabelecimentoService(repository);
+    }
+
+    private Estabelecimento dados(String nome, Double latitude, Double longitude) {
+        Estabelecimento estabelecimento = new Estabelecimento();
+        estabelecimento.setNome(nome);
+        estabelecimento.setDescricao("Descrição");
+        estabelecimento.setCategoria("Mercado");
+        estabelecimento.setLatitude(latitude);
+        estabelecimento.setLongitude(longitude);
+        return estabelecimento;
+    }
+
+    @Test
+    void buscarProximosEnviaCoordenadasEDistanciaEmMetros() {
+        List<Estabelecimento> encontrados = List.of(dados("Mercado", -6.89, -38.56));
+        when(repository.buscarProximos(-6.89, -38.56, 2000)).thenReturn(encontrados);
+
+        assertSame(encontrados, service.buscarProximos(-6.89, -38.56, 2000));
+        verify(repository).buscarProximos(-6.89, -38.56, 2000);
+    }
+
+    @Test
+    void buscarProximosRejeitaParametrosInvalidosAntesDeConsultar() {
+        double[][] entradas = {
+                {91, 0, 2000}, {0, -181, 2000}, {0, 0, 0}, {0, 0, -1},
+                {Double.NaN, 0, 2000}, {0, Double.POSITIVE_INFINITY, 2000},
+                {0, 0, Double.NaN}
+        };
+        for (double[] entrada : entradas) {
+            try {
+                service.buscarProximos(entrada[0], entrada[1], entrada[2]);
+                fail("Deveria rejeitar os parâmetros inválidos");
+            } catch (ResponseStatusException erro) {
+                assertEquals(HttpStatus.BAD_REQUEST, erro.getStatusCode());
+            }
+        }
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void cadastrarSalvaPontoComLongitudeNoXELatitudeNoY() {
+        Estabelecimento salvo = dados("Mercado", -6.89, -38.56);
+        when(repository.save(any())).thenReturn(salvo);
+
+        Estabelecimento resposta = service.cadastrar(dados("Mercado", -6.89, -38.56));
+
+        ArgumentCaptor<Estabelecimento> captor = ArgumentCaptor.forClass(Estabelecimento.class);
+        verify(repository).save(captor.capture());
+        Estabelecimento enviado = captor.getValue();
+        assertEquals(4326, enviado.getLocalizacao().getSRID());
+        assertEquals(-38.56, enviado.getLocalizacao().getX());
+        assertEquals(-6.89, enviado.getLocalizacao().getY());
+        assertEquals(-6.89, resposta.getLatitude());
+        assertEquals(-38.56, resposta.getLongitude());
+    }
+
+    @Test
+    void buscarPorAreaEnviaOsQuatroLimitesAoRepository() {
+        List<Estabelecimento> encontrados = List.of(dados("Mercado", -6.89, -38.56));
+        when(repository.buscarPorArea(-6.95, -6.85, -38.65, -38.50)).thenReturn(encontrados);
+
+        assertSame(encontrados, service.buscarPorArea(-6.95, -6.85, -38.65, -38.50));
+        verify(repository).buscarPorArea(-6.95, -6.85, -38.65, -38.50);
+    }
+
+    @Test
+    void buscarPorAreaRejeitaLimitesInvalidosAntesDeConsultar() {
+        double[][] entradas = {
+                {-91, 0, -10, 10}, {0, 91, -10, 10}, {-10, 10, -181, 0},
+                {-10, 10, 0, 181}, {10, -10, -10, 10}, {-10, 10, 10, -10},
+                {0, 0, -10, 10}, {-10, 10, 0, 0}, {Double.NaN, 10, -10, 10},
+                {-10, Double.POSITIVE_INFINITY, -10, 10}, {-10, 10, Double.NaN, 10},
+                {-10, 10, -10, Double.POSITIVE_INFINITY}
+        };
+        for (double[] entrada : entradas) {
+            try {
+                service.buscarPorArea(entrada[0], entrada[1], entrada[2], entrada[3]);
+                fail("Deveria rejeitar os limites inválidos");
+            } catch (ResponseStatusException erro) {
+                assertEquals(HttpStatus.BAD_REQUEST, erro.getStatusCode());
+            }
+        }
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void consultarRetornaDadosDoEstabelecimento() {
+        Long id = 1L;
+        Estabelecimento existente = new Estabelecimento();
+        existente.setNome("Mercado");
+        existente.setLocalizacao(new org.locationtech.jts.geom.GeometryFactory()
+                .createPoint(new org.locationtech.jts.geom.Coordinate(-38.56, -6.89)));
+        when(repository.findById(id)).thenReturn(Optional.of(existente));
+
+        assertEquals("Mercado", service.consultar(id).getNome());
+    }
+
+    @Test
+    void atualizarAlteraORegistroEncontrado() {
+        Long id = 1L;
+        Estabelecimento existente = new Estabelecimento();
+        when(repository.findById(id)).thenReturn(Optional.of(existente));
+        when(repository.save(existente)).thenReturn(existente);
+
+        Estabelecimento resposta = service.atualizar(id, dados("Novo nome", -7.0, -39.0));
+
+        assertEquals("Novo nome", resposta.getNome());
+        assertEquals(-39.0, existente.getLocalizacao().getX());
+        verify(repository).save(existente);
+    }
+
+    @Test
+    void excluirRemoveORegistroEncontrado() {
+        Long id = 1L;
+        Estabelecimento existente = new Estabelecimento();
+        when(repository.findById(id)).thenReturn(Optional.of(existente));
+
+        service.excluir(id);
+
+        verify(repository).delete(existente);
+    }
+
+    @Test
+    void operacoesComIdInexistenteRetornam404() {
+        Long id = 1L;
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        try {
+            service.consultar(id);
+            fail("Deveria retornar 404 ao consultar");
+        } catch (ResponseStatusException erro) {
+            assertEquals(HttpStatus.NOT_FOUND, erro.getStatusCode());
+        }
+        try {
+            service.atualizar(id, dados("Mercado", 0.0, 0.0));
+            fail("Deveria retornar 404 ao atualizar");
+        } catch (ResponseStatusException erro) {
+            assertEquals(HttpStatus.NOT_FOUND, erro.getStatusCode());
+        }
+        try {
+            service.excluir(id);
+            fail("Deveria retornar 404 ao excluir");
+        } catch (ResponseStatusException erro) {
+            assertEquals(HttpStatus.NOT_FOUND, erro.getStatusCode());
+        }
+        verify(repository, never()).save(any());
+        verify(repository, never()).delete(any(Estabelecimento.class));
+    }
+
+    @Test
+    void rejeitarCadastroSemNomeOuCoordenadasValidas() {
+        for (Estabelecimento invalido : new Estabelecimento[] {
+                dados(" ", 0.0, 0.0), dados("Mercado", null, 0.0),
+                dados("Mercado", 91.0, 0.0), dados("Mercado", 0.0, -181.0),
+                dados("Mercado", Double.NaN, 0.0) }) {
+            try {
+                service.cadastrar(invalido);
+                fail("Deveria rejeitar os dados inválidos");
+            } catch (ResponseStatusException erro) {
+                assertEquals(HttpStatus.BAD_REQUEST, erro.getStatusCode());
+            }
+        }
+        verify(repository, never()).save(any());
+    }
+}
+
+
+
