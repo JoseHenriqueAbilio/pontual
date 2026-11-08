@@ -31,6 +31,14 @@
                 </select>
             </p>
             <button type="button" id="buscar-area">Buscar nesta área</button>
+            <form id="busca-proximos">
+                <p>
+                    <label for="distancia">Distância em metros</label><br>
+                    <input type="number" id="distancia" min="1" value="2000" required>
+                </p>
+                <button type="submit" id="buscar-proximos" disabled>Buscar próximos</button>
+                <p id="aviso-localizacao">Permita o acesso à localização para buscar próximos.</p>
+            </form>
             <p id="mensagem" role="status"></p>
             <ul id="estabelecimentos"></ul>
         </aside>

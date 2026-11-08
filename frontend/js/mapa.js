@@ -24,7 +24,13 @@ function iniciarMapa() {
     }).addTo(mapa);
 
     const marcadores = L.layerGroup().addTo(mapa);
+    const formularioProximos = document.getElementById('busca-proximos');
+    const botaoProximos = document.getElementById('buscar-proximos');
+    const distancia = document.getElementById('distancia');
     let estabelecimentos = [];
+    let localizacao;
+    let esperaArea;
+    let consultaAtual;
 
     function preencherCategorias() {
         const selecionada = categoria.value;
@@ -85,7 +91,7 @@ function iniciarMapa() {
             : 'Nenhum estabelecimento encontrado.';
     }
 
-    async function buscarArea() {
+    function buscarArea() {
         const limites = mapa.getBounds();
         const parametros = new URLSearchParams({
             sul: Math.max(-90, limites.getSouth()),
@@ -94,44 +100,84 @@ function iniciarMapa() {
             leste: Math.min(180, limites.getEast())
         });
 
-        botaoBuscar.disabled = true;
+        consultar('/api/estabelecimentos/area?' + parametros);
+    }
+
+    function buscarProximos(evento) {
+        evento.preventDefault();
+        if (!localizacao) {
+            return;
+        }
+        const parametros = new URLSearchParams({
+            lat: localizacao[0],
+            lng: localizacao[1],
+            distancia: distancia.value
+        });
+        consultar('/api/estabelecimentos/proximos?' + parametros);
+    }
+
+    async function consultar(url) {
+        clearTimeout(esperaArea);
+        consultaAtual?.abort();
+        const consulta = new AbortController();
+        consultaAtual = consulta;
         mensagem.textContent = 'Carregando estabelecimentos...';
         try {
-            const resposta = await fetch('/api/estabelecimentos/area?' + parametros);
+            const resposta = await fetch(url, { signal: consulta.signal });
             if (!resposta.ok) {
                 throw new Error('HTTP ' + resposta.status);
             }
-            estabelecimentos = await resposta.json();
+            const dados = await resposta.json();
+            if (consulta.signal.aborted) {
+                return;
+            }
+            estabelecimentos = dados;
             preencherCategorias();
             mostrarEstabelecimentos();
         } catch (erro) {
+            if (consulta.signal.aborted) {
+                return;
+            }
             estabelecimentos = [];
             preencherCategorias();
             mostrarEstabelecimentos();
-            mensagem.textContent = 'Não foi possível carregar os estabelecimentos. Tente buscar nesta área novamente.';
-        } finally {
-            botaoBuscar.disabled = false;
+            mensagem.textContent = 'Não foi possível carregar os estabelecimentos. Tente novamente.';
         }
     }
 
+    function agendarBuscaPorArea() {
+        clearTimeout(esperaArea);
+        consultaAtual?.abort();
+        esperaArea = setTimeout(buscarArea, 300);
+    }
+
+    function iniciarConsultas() {
+        mapa.on('moveend', agendarBuscaPorArea);
+        botaoBuscar.disabled = false;
+        buscarArea();
+    }
+
     function mostrarLocalizacao(posicao) {
-        const coordenadas = [posicao.coords.latitude, posicao.coords.longitude];
-        mapa.setView(coordenadas, 13);
-        L.marker(coordenadas, { alt: 'Sua localização' })
+        localizacao = [posicao.coords.latitude, posicao.coords.longitude];
+        mapa.setView(localizacao, 13);
+        L.marker(localizacao, { alt: 'Sua localização' })
             .bindPopup('Sua localização')
             .addTo(mapa)
             .openPopup();
-        buscarArea();
+        botaoProximos.disabled = false;
+        document.getElementById('aviso-localizacao').hidden = true;
+        iniciarConsultas();
     }
 
     pesquisa.addEventListener('input', mostrarEstabelecimentos);
     categoria.addEventListener('change', mostrarEstabelecimentos);
     botaoBuscar.addEventListener('click', buscarArea);
+    formularioProximos.addEventListener('submit', buscarProximos);
     if (navigator.geolocation) {
         botaoBuscar.disabled = true;
         mensagem.textContent = 'Aguardando a localização do navegador...';
-        navigator.geolocation.getCurrentPosition(mostrarLocalizacao, buscarArea, { timeout: 10000 });
+        navigator.geolocation.getCurrentPosition(mostrarLocalizacao, iniciarConsultas, { timeout: 10000 });
     } else {
-        buscarArea();
+        iniciarConsultas();
     }
 }
