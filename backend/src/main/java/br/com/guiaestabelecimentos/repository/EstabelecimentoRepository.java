@@ -12,10 +12,9 @@ public interface EstabelecimentoRepository extends JpaRepository<Estabelecimento
 
     @Query(value = """
             SELECT e.* FROM public.estabelecimento e
-            WHERE extensions.ST_DWithin(
+            WHERE ST_DWithin(
                 e.localizacao,
-                CAST(extensions.ST_SetSRID(extensions.ST_MakePoint(:lng, :lat), 4326)
-                     AS extensions.geography),
+                CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography),
                 :distancia
             )
             """, nativeQuery = true)
@@ -25,9 +24,9 @@ public interface EstabelecimentoRepository extends JpaRepository<Estabelecimento
 
     @Query(value = """
             SELECT e.* FROM public.estabelecimento e
-            WHERE extensions.ST_Intersects(
-                CAST(e.localizacao AS extensions.geometry),
-                extensions.ST_MakeEnvelope(:oeste, :sul, :leste, :norte, 4326)
+            WHERE ST_Intersects(
+                CAST(e.localizacao AS geometry),
+                ST_MakeEnvelope(:oeste, :sul, :leste, :norte, 4326)
             )
             """, nativeQuery = true)
     List<Estabelecimento> buscarPorArea(@Param("sul") double sul,
