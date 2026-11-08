@@ -1,0 +1,11 @@
+**
+!Dockerfile
+!backend/
+!backend/pom.xml
+!backend/src/
+!backend/src/main/
+!backend/src/main/**
+!frontend/
+!frontend/**
+**/.env
+**/.env.*
